@@ -122,21 +122,24 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
     // On message received
     @Override
     public void processMessage(Chat chat, Message message) {
-        for (Filter filter : Filters.filters) {
-            if (!filter.inputFiltering(chat, message)) {
-                filter.onInputError(chat, message);
-                return;
+        if (message.getType() == Message.Type.normal) {
+            Input input = new Input(chat, message);
+            for (Filter filter : Filters.filters) {
+                if (!filter.inputFiltering(input)) {
+                    filter.onInputError(input);
+                    return;
+                }
             }
-        }
 
-        for (InputListener listener : this.input_listeners) {
-            listener.messageReceived(this, chat, message);
+            for (InputListener listener : this.input_listeners) {
+                listener.messageReceived(this, input);
+            }
         }
     }
 
     public void send(Chat chat, Input input) {
         for (Filter filter : Filters.filters) {
-            filter.outputFiltering(chat, input);
+            filter.outputFiltering(input);
         }
 
         try {
@@ -148,7 +151,7 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
 
     public void send(Chat chat, Output output) {
         for (Filter filter : Filters.filters) {
-            filter.outputFiltering(chat, output);
+            filter.outputFiltering(output);
         }
 
         try {

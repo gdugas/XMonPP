@@ -1,10 +1,14 @@
 package org.xmonpp.io;
 
-public class Output {
+import org.jivesoftware.smack.Chat;
 
-    protected String body = "";
+public class Output extends IO {
 
-    public void setContent(String content) {
-        this.body = content;
+    public Output(Chat chat) {
+        super(chat, "");
+    }
+
+    public Output(Chat chat, String message) {
+        super(chat, message);
     }
 }
