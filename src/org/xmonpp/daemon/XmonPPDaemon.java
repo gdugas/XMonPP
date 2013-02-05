@@ -8,6 +8,9 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
@@ -50,6 +53,30 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
         chat.addMessageListener(this);
+    }
+
+    public boolean addUser(String id, String name, String[] groups) {
+        if (!this.isLogged()) {
+            return false;
+        }
+
+        Roster r = this.conn.getRoster();
+        try {
+            r.createEntry(id, name, groups);
+        } catch (XMPPException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public RosterEntry getUser(String name) {
+        Roster r = this.conn.getRoster();
+        return r.getEntry(name);
+    }
+    
+    public boolean hasUser(String name) {
+        Roster r = this.conn.getRoster();
+        return r.getEntry(name) != null;
     }
 
     public boolean isLogged() {
