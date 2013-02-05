@@ -12,10 +12,12 @@ import org.jivesoftware.smack.packet.Message;
  * @author guillaume
  */
 public interface Filter {
-    
+
     public boolean inputFiltering(Chat chat, Message message);
 
-    public boolean outputFiltering(Chat chat, Input input);
+    public void onInputError(Chat chat, Message message);
 
-    public boolean outputFiltering(Chat chat, Output output);
+    public void outputFiltering(Chat chat, Input input);
+
+    public void outputFiltering(Chat chat, Output output);
 }

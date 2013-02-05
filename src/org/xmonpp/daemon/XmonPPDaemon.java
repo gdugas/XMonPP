@@ -10,7 +10,6 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
@@ -19,7 +18,6 @@ import org.jivesoftware.smack.packet.Presence;
 import org.xmonpp.conf.Settings;
 import org.xmonpp.logger.Logger;
 import org.xmonpp.io.Filter;
-import org.xmonpp.io.FilteringErrorListener;
 import org.xmonpp.io.Filters;
 import org.xmonpp.io.Input;
 import org.xmonpp.io.InputListener;
@@ -29,7 +27,6 @@ import org.xmonpp.io.OutputListener;
 public class XmonPPDaemon implements ChatManagerListener, MessageListener {
 
     private Collection<InputListener> input_listeners = new ArrayList<InputListener>();
-    private Collection<FilteringErrorListener> filtering_listeners = new ArrayList<FilteringErrorListener>();
     private Collection<OutputListener> output_listeners = new ArrayList<OutputListener>();
     private boolean logged = false;
     private ConnectionConfiguration config;
@@ -44,10 +41,6 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
 
     public void addOutputListener(OutputListener listener) {
         this.output_listeners.add(listener);
-    }
-
-    public void addFilteringErrorListener(FilteringErrorListener listener) {
-        this.filtering_listeners.add(listener);
     }
 
     @Override
@@ -73,7 +66,7 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
         Roster r = this.conn.getRoster();
         return r.getEntry(name);
     }
-    
+
     public boolean hasUser(String name) {
         Roster r = this.conn.getRoster();
         return r.getEntry(name) != null;
@@ -131,9 +124,7 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
     public void processMessage(Chat chat, Message message) {
         for (Filter filter : Filters.filters) {
             if (!filter.inputFiltering(chat, message)) {
-                for (FilteringErrorListener listener : this.filtering_listeners) {
-                    listener.onInputError(filter, chat, message);
-                }
+                filter.onInputError(chat, message);
                 return;
             }
         }
@@ -145,12 +136,7 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
 
     public void send(Chat chat, Input input) {
         for (Filter filter : Filters.filters) {
-            if (!filter.outputFiltering(chat, input)) {
-                for (FilteringErrorListener listener : this.filtering_listeners) {
-                    listener.onOutputError(filter, chat, input);
-                }
-                return;
-            }
+            filter.outputFiltering(chat, input);
         }
 
         try {
@@ -162,12 +148,7 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
 
     public void send(Chat chat, Output output) {
         for (Filter filter : Filters.filters) {
-            if (!filter.outputFiltering(chat, output)) {
-                for (FilteringErrorListener listener : this.filtering_listeners) {
-                    listener.onOutputError(filter, chat, output);
-                }
-                return;
-            }
+            filter.outputFiltering(chat, output);
         }
 
         try {
