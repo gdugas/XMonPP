@@ -46,11 +46,10 @@ public class IO {
             subattrs.add(it.next());
         }
 
-        String text = StringUtils.join(subattrs, ";");
-        text.concat("\n");
-        text.concat(this.body);
+        String text = "#".concat(StringUtils.join(subattrs, ";"));
+        text = text.concat("\n").concat(this.body);
 
-        message.setBody(body);
+        message.setBody(text);
         return message;
     }
 

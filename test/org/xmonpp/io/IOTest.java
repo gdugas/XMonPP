@@ -5,6 +5,7 @@
 package org.xmonpp.io;
 
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.packet.Message;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -26,7 +27,7 @@ public class IOTest {
     private String body;
     private String message;
     private HashMap attrs;
-    
+
     public IOTest() {
     }
 
@@ -41,15 +42,15 @@ public class IOTest {
     @Before
     public void setUp() {
         Chat chat = XmppDaemon.getChatManager().createChat("xmonpp01@localhost", null);
-        
+
         this.attrs = new HashMap();
         this.attrs.put("param1", "1");
         this.attrs.put("param2", "2");
-        
+
         this.head = "#param1=1;param2=2";
         this.body = "my cmdline\nmy second line";
         this.message = this.head.concat("\n").concat(this.body);
-        
+
         this.io = new IO(chat, this.message);
     }
 
@@ -62,13 +63,13 @@ public class IOTest {
      */
     @Test
     public void testGetAttr() {
-        Object key,expResult,result;
-        
+        Object key, expResult, result;
+
         key = "param1";
         expResult = "1";
         result = this.io.getAttr(key);
         assertEquals(expResult, result);
-        
+
         key = "param2";
         expResult = "2";
         result = this.io.getAttr(key);
@@ -82,13 +83,16 @@ public class IOTest {
     public void testGetAttrs() {
         assertEquals(this.attrs.toString(), this.io.getAttrs().toString());
     }
-    
+
     /**
      * Test of getMessage method, of class IO.
      */
     @Test
     public void testGetMessage() {
+        Message m = this.io.getMessage();
+        
         assertEquals(this.body, this.io.body);
+        assertEquals(this.message, m.getBody());
     }
 
     /**
