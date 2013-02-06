@@ -14,7 +14,7 @@ public interface Filter {
 
     public void onInputError(Input input);
 
-    public void outputFiltering(Input input);
+    public boolean outputFiltering(Output output);
 
-    public void outputFiltering(Output output);
+    public void onOutputError(Output output);
 }

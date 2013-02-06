@@ -137,21 +137,12 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
         }
     }
 
-    public void send(Chat chat, Input input) {
-        for (Filter filter : Filters.filters) {
-            filter.outputFiltering(input);
-        }
-
-        try {
-            chat.sendMessage(input.toString());
-        } catch (XMPPException e) {
-            Logger.error("Sending request error: " + e.getMessage());
-        }
-    }
-
     public void send(Chat chat, Output output) {
         for (Filter filter : Filters.filters) {
-            filter.outputFiltering(output);
+            if (!filter.outputFiltering(output)) {
+                filter.onOutputError(output);
+                return;
+            }
         }
 
         try {
