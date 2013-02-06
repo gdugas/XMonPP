@@ -41,7 +41,7 @@ public class IOTest {
 
     @Before
     public void setUp() {
-        Chat chat = XmppDaemon.getChatManager().createChat("xmonpp01@localhost", null);
+        Chat chat = XmppDaemon.getChatManager().createChat(XmppDaemon.user, null);
 
         this.attrs = new HashMap();
         this.attrs.put("param1", "1");

@@ -17,19 +17,25 @@ public class XmppDaemon {
 
     private static ChatManager chatManager = null;
     private static XMPPConnection conn = null;
-
+    
+    public static String user = "xmonpp01@localhost";
+    public static String password = "xmonpp";
+    public static String host = "localhost";
+    public static String domain = "unittest";
+    public static Integer port = 5222;
+    
     public static void login() {
         if (XmppDaemon.conn == null) {
-            ConnectionConfiguration conf = new ConnectionConfiguration("localhost", 5222);
+            ConnectionConfiguration conf = new ConnectionConfiguration(XmppDaemon.host, XmppDaemon.port);
             XmppDaemon.conn = new XMPPConnection(conf);
 
             try {
                 XmppDaemon.conn.connect();
-                XmppDaemon.conn.login("xmonpp01@localhost", "xmonpp", "unittest");
+                XmppDaemon.conn.login(XmppDaemon.user, XmppDaemon.password, XmppDaemon.domain);
                 XmppDaemon.chatManager = XmppDaemon.conn.getChatManager();
 
             } catch (XMPPException e) {
-                System.out.println("Unable to connect to xmpp server: xmonpp01@localhost:5222");
+                System.out.println("Unable to connect to xmpp server: ".concat(XmppDaemon.user).concat(":").concat("5222"));
                 System.exit(1);
             }
         }
