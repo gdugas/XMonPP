@@ -63,6 +63,7 @@ public class IOTest {
      */
     @Test
     public void testGetAttr() {
+        System.out.println("IO.getAttr");
         Object key, expResult, result;
 
         key = "param1";
@@ -81,6 +82,7 @@ public class IOTest {
      */
     @Test
     public void testGetAttrs() {
+        System.out.println("IO.getAttrs");
         assertEquals(this.attrs.toString(), this.io.getAttrs().toString());
     }
 
@@ -89,6 +91,7 @@ public class IOTest {
      */
     @Test
     public void testGetMessage() {
+        System.out.println("IO.getMessage");
         Message m = this.io.getMessage();
         
         assertEquals(this.body, this.io.body);
@@ -100,6 +103,7 @@ public class IOTest {
      */
     @Test
     public void testSetAttr() {
+        System.out.println("IO.setAttr");
         assertEquals(this.io.getAttr("param3"), null);
         this.io.setAttr("param3", "three");
         assertEquals(this.io.getAttr("param3"), "three");
