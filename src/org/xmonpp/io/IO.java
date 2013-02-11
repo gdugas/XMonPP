@@ -4,15 +4,13 @@
  */
 package org.xmonpp.io;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Properties;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
-import org.apache.commons.lang.StringUtils;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.packet.Message;
+import org.xmonpp.logger.Logger;
 
 /**
  *
@@ -20,82 +18,74 @@ import org.jivesoftware.smack.packet.Message;
  */
 public class IO {
 
-    protected HashMap attrs = new HashMap();
-    public Chat chat;
-    public String body = "";
+    protected Chat chat;
+    protected Message message;
+    protected Properties properties;
+
+    public IO(Chat chat) {
+        this.chat = chat;
+        this.message = new Message();
+        this.properties = IO.parseProperties(this.message);
+    }
 
     public IO(Chat chat, String message) {
         this.chat = chat;
-        this.parse(message);
+        this.message = new Message();
+        this.message.setBody(message);
+        this.properties = IO.parseProperties(this.message);
     }
 
-    public Object getAttr(Object key) {
-        return this.attrs.get(key);
+    public IO(Chat chat, Message message) {
+        this.chat = chat;
+        this.message = message;
+        this.properties = IO.parseProperties(this.message);
     }
 
-    public HashMap getAttrs() {
-        return this.attrs;
+    public String getProperty(String key) {
+        return this.properties.getProperty(key);
+    }
+
+    public String getProperty(String key, String vdef) {
+        return this.properties.getProperty(key, vdef);
+    }
+    
+    public Properties getProperties() {
+        return this.properties;
     }
 
     public Message getMessage() {
-        Message message = new Message();
+        Message m = this.message;
+        ByteArrayOutputStream o = new ByteArrayOutputStream();
 
-        List<String> subattrs = new ArrayList();
-        Iterator<String> it = this.attrs.entrySet().iterator();
-        while (it.hasNext()) {
-            subattrs.add(it.next());
+        try {
+            this.properties.store(o, null);
+            boolean b = message.removeSubject("xm");
+            message.addSubject("xm", o.toString());
+
+        } catch (Exception e) {
+            Logger.error("IO.getMessage exception: ".concat(e.getMessage()));
         }
 
-        String text = "#".concat(StringUtils.join(subattrs, ";"));
-        text = text.concat("\n").concat(this.body);
-
-        message.setBody(text);
         return message;
     }
 
-    private void parse(String message) {
-        HashMap map = new HashMap();
-
-        List<String> rq = Arrays.asList(message.split("\n"));
-        Iterator<String> lines = rq.iterator();
-
-        if (lines.hasNext()) {
-            String line = lines.next();
-            if (line.length() > 0 && line.charAt(0) == '#') {
-                line = line.substring(1);
-                List<String> params = Arrays.asList(line.split(";"));
-                Iterator<String> values = params.iterator();
-
-                while (values.hasNext()) {
-                    String kv = values.next();
-                    List<String> kvl = Arrays.asList(kv.split("="));
-                    String k = kvl.get(0);
-                    String v = "";
-                    if (kvl.size() > 1) {
-                        v = kvl.get(1);
-                    }
-                    map.put(k, v);
-                }
+    public static Properties parseProperties(Message m) {
+        Properties p = new Properties();
+        String subject = m.getSubject("xm");
+        if (subject != null) {
+            try {
+                p.load(new ByteArrayInputStream(subject.getBytes()));
+            } catch (Exception e) {
             }
         }
-
-        String text = "";
-        Integer i = 0;
-        while (lines.hasNext()) {
-            String line = lines.next();
-            if (i > 0) {
-                text = text.concat("\n").concat(line);
-            } else {
-                text = text.concat(line);
-            }
-            i++;
-        }
-        this.body = text;
-
-        this.attrs.putAll(map);
+        return p;
     }
 
-    public void setAttr(Object key, Object value) {
-        this.attrs.put(key, value);
+    public void setProperty(String key, String value) {
+        this.properties.put(key, value);
+    }
+    
+    public void removeProperty(String key) {
+        this.properties.remove(key);
     }
 }

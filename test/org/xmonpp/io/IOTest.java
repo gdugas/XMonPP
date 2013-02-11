@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import java.util.HashMap;
+import java.util.Properties;
 import org.xmonpp.test.XmppDaemon;
 
 /**
@@ -22,28 +22,15 @@ import org.xmonpp.test.XmppDaemon;
  */
 public class IOTest {
 
-    private static IO io;
-    private static String head;
-    private static String body;
-    private static String message;
-    private static HashMap attrs;
-
+    private static Chat chat;
+    private IO io;
+    
     public IOTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Chat chat = XmppDaemon.getChatManager().createChat(XmppDaemon.user, null);
-        System.out.println("setup");
-        IOTest.attrs = new HashMap();
-        IOTest.attrs.put("param1", "1");
-        IOTest.attrs.put("param2", "2");
-
-        IOTest.head = "#param1=1;param2=2";
-        IOTest.body = "my cmdline\nmy second line";
-        IOTest.message = IOTest.head.concat("\n").concat(IOTest.body);
-
-        IOTest.io = new IO(chat, IOTest.message);
+        IOTest.chat = XmppDaemon.getChatManager().createChat(XmppDaemon.user, null);
     }
 
     @AfterClass
@@ -52,38 +39,15 @@ public class IOTest {
 
     @Before
     public void setUp() {
+        Message message = new Message();
+        message.setBody("my cmdline\nmy second line");
+        message.addSubject("xm", "param1=1\nparam2=2");
+        
+        this.io = new IO(chat, message);
     }
 
     @After
     public void tearDown() {
-    }
-
-    /**
-     * Test of getAttr method, of class IO.
-     */
-    @Test
-    public void testGetAttr() {
-        System.out.println("IO.getAttr");
-        Object key, expResult, result;
-
-        key = "param1";
-        expResult = "1";
-        result = IOTest.io.getAttr(key);
-        assertEquals(expResult, result);
-
-        key = "param2";
-        expResult = "2";
-        result = IOTest.io.getAttr(key);
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of getAttrs method, of class IO.
-     */
-    @Test
-    public void testGetAttrs() {
-        System.out.println("IO.getAttrs");
-        assertEquals(IOTest.attrs.toString(), IOTest.io.getAttrs().toString());
     }
 
     /**
@@ -92,20 +56,80 @@ public class IOTest {
     @Test
     public void testGetMessage() {
         System.out.println("IO.getMessage");
-        Message m = IOTest.io.getMessage();
         
-        assertEquals(IOTest.body, IOTest.io.body);
-        assertEquals(IOTest.message, m.getBody());
+        io.setProperty("param3", "3");
+        Message message = io.getMessage();
+        String subject = message.getSubject("xm");
+        
+        assertEquals("my cmdline\nmy second line", message.getBody());
+        assertEquals("param3=3\nparam2=2\nparam1=1\n", subject.substring(subject.indexOf('\n') + 1));
+    }
+    
+    /**
+     * Test of getProperty method, of class IO.
+     */
+    @Test
+    public void testGetProperty() {
+        System.out.println("IO.getProperty");
+        String key, expResult, result;
+        
+        key = "param1";
+        expResult = "1";
+        result = this.io.getProperty(key);
+        assertEquals(expResult, result);
+
+        key = "param2";
+        expResult = "2";
+        result = this.io.getProperty(key);
+        assertEquals(expResult, result);
+        
+        key = "paramTest";
+        expResult = "test";
+        result = this.io.getProperty(key, "test");
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of getParseProperties method, of class IO.
+     */
+    @Test
+    public void testParseProperties() {
+        System.out.println("IO.parseProperties");
+        
+        Properties props = new Properties();
+        props.setProperty("param1", "1");
+        props.setProperty("param2", "2");
+        
+        assertEquals(props.toString(), this.io.getProperties().toString());
+    }
+    
+    /**
+     * Test of getRemoveProperty method, of class IO.
+     */
+    @Test
+    public void testRemoveProperty() {
+        System.out.println("IO.removeProperty");
+        this.io.removeProperty("param1");
+        assertEquals(null, this.io.getProperty("param1"));
     }
 
     /**
-     * Test of setAttr method, of class IO.
+     * Test of setProperty method, of class IO.
      */
     @Test
-    public void testSetAttr() {
-        System.out.println("IO.setAttr");
-        assertEquals(IOTest.io.getAttr("param3"), null);
-        IOTest.io.setAttr("param3", "three");
-        assertEquals(IOTest.io.getAttr("param3"), "three");
+    public void testSetProperty() {
+        System.out.println("IO.setProperty");
+        String key, expResult, result;
+        
+        this.io.setProperty("param1", "un");
+        key = "param1";
+        expResult = "un";
+        result = this.io.getProperty(key);
+        assertEquals(expResult, result);
+
+        key = "param2";
+        expResult = "2";
+        result = this.io.getProperty(key);
+        assertEquals(expResult, result);
     }
 }

@@ -14,7 +14,7 @@ import org.jivesoftware.smack.packet.Message;
 public class Input extends IO {
     
     public Input(Chat chat, Message message) {
-        super(chat, message.getBody());
+        super(chat, message);
     }
     
     public Input(Chat chat, String message) {
