@@ -47,6 +47,10 @@ public class Settings {
         return value;
     }
 
+    public static void reset() {
+        Settings.ini = new HierarchicalINIConfiguration();
+    }
+
     public static void set(String key, Object value) {
         Settings.ini.setProperty(key, value);
 
