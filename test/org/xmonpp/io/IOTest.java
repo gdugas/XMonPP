@@ -22,17 +22,28 @@ import org.xmonpp.test.XmppDaemon;
  */
 public class IOTest {
 
-    private IO io;
-    private String head;
-    private String body;
-    private String message;
-    private HashMap attrs;
+    private static IO io;
+    private static String head;
+    private static String body;
+    private static String message;
+    private static HashMap attrs;
 
     public IOTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        Chat chat = XmppDaemon.getChatManager().createChat(XmppDaemon.user, null);
+        System.out.println("setup");
+        IOTest.attrs = new HashMap();
+        IOTest.attrs.put("param1", "1");
+        IOTest.attrs.put("param2", "2");
+
+        IOTest.head = "#param1=1;param2=2";
+        IOTest.body = "my cmdline\nmy second line";
+        IOTest.message = IOTest.head.concat("\n").concat(IOTest.body);
+
+        IOTest.io = new IO(chat, IOTest.message);
     }
 
     @AfterClass
@@ -41,17 +52,6 @@ public class IOTest {
 
     @Before
     public void setUp() {
-        Chat chat = XmppDaemon.getChatManager().createChat(XmppDaemon.user, null);
-
-        this.attrs = new HashMap();
-        this.attrs.put("param1", "1");
-        this.attrs.put("param2", "2");
-
-        this.head = "#param1=1;param2=2";
-        this.body = "my cmdline\nmy second line";
-        this.message = this.head.concat("\n").concat(this.body);
-
-        this.io = new IO(chat, this.message);
     }
 
     @After
@@ -68,12 +68,12 @@ public class IOTest {
 
         key = "param1";
         expResult = "1";
-        result = this.io.getAttr(key);
+        result = IOTest.io.getAttr(key);
         assertEquals(expResult, result);
 
         key = "param2";
         expResult = "2";
-        result = this.io.getAttr(key);
+        result = IOTest.io.getAttr(key);
         assertEquals(expResult, result);
     }
 
@@ -83,7 +83,7 @@ public class IOTest {
     @Test
     public void testGetAttrs() {
         System.out.println("IO.getAttrs");
-        assertEquals(this.attrs.toString(), this.io.getAttrs().toString());
+        assertEquals(IOTest.attrs.toString(), IOTest.io.getAttrs().toString());
     }
 
     /**
@@ -92,10 +92,10 @@ public class IOTest {
     @Test
     public void testGetMessage() {
         System.out.println("IO.getMessage");
-        Message m = this.io.getMessage();
+        Message m = IOTest.io.getMessage();
         
-        assertEquals(this.body, this.io.body);
-        assertEquals(this.message, m.getBody());
+        assertEquals(IOTest.body, IOTest.io.body);
+        assertEquals(IOTest.message, m.getBody());
     }
 
     /**
@@ -104,8 +104,8 @@ public class IOTest {
     @Test
     public void testSetAttr() {
         System.out.println("IO.setAttr");
-        assertEquals(this.io.getAttr("param3"), null);
-        this.io.setAttr("param3", "three");
-        assertEquals(this.io.getAttr("param3"), "three");
+        assertEquals(IOTest.io.getAttr("param3"), null);
+        IOTest.io.setAttr("param3", "three");
+        assertEquals(IOTest.io.getAttr("param3"), "three");
     }
 }
