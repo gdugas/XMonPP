@@ -41,6 +41,10 @@ public class IO {
         this.properties = IO.parseProperties(this.message);
     }
 
+    public Chat getChat() {
+        return this.chat;
+    }
+
     public String getProperty(String key) {
         return this.properties.getProperty(key);
     }
@@ -48,7 +52,7 @@ public class IO {
     public String getProperty(String key, String vdef) {
         return this.properties.getProperty(key, vdef);
     }
-    
+
     public Properties getProperties() {
         return this.properties;
     }
@@ -84,7 +88,7 @@ public class IO {
     public void setProperty(String key, String value) {
         this.properties.put(key, value);
     }
-    
+
     public void removeProperty(String key) {
         this.properties.remove(key);
     }
