@@ -25,34 +25,34 @@ import org.xmonpp.io.Output;
 import org.xmonpp.io.OutputListener;
 
 public class XmonPPDaemon implements ChatManagerListener, MessageListener {
-
+    
     private Collection<InputListener> input_listeners = new ArrayList<InputListener>();
     private Collection<OutputListener> output_listeners = new ArrayList<OutputListener>();
     private boolean logged = false;
     private ConnectionConfiguration config;
     private XMPPConnection conn;
-
+    
     public XmonPPDaemon() {
     }
-
+    
     public void addInputListener(InputListener listener) {
         this.input_listeners.add(listener);
     }
-
+    
     public void addOutputListener(OutputListener listener) {
         this.output_listeners.add(listener);
     }
-
+    
     @Override
     public void chatCreated(Chat chat, boolean createdLocally) {
         chat.addMessageListener(this);
     }
-
+    
     public boolean addUser(String id, String name, String[] groups) {
         if (!this.isLogged()) {
             return false;
         }
-
+        
         Roster r = this.conn.getRoster();
         try {
             r.createEntry(id, name, groups);
@@ -61,28 +61,28 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
         }
         return true;
     }
-
+    
     public RosterEntry getUser(String name) {
         Roster r = this.conn.getRoster();
         return r.getEntry(name);
     }
-
+    
     public boolean hasUser(String name) {
         Roster r = this.conn.getRoster();
         return r.getEntry(name) != null;
     }
-
+    
     public boolean isLogged() {
         return this.logged;
     }
-
+    
     public boolean login() {
         String host = Settings.get("xmpp.xmpp_host").toString();
         Integer port = new Integer(Settings.get("xmpp.xmpp_port", 5222).toString());
-
+        
         this.config = new ConnectionConfiguration(host, port);
         this.conn = new XMPPConnection(this.config);
-
+        
         try {
             Logger.log("Xmpp connecting attempt on "
                     + Settings.get("xmpp.xmpp_host") + ":" + port);
@@ -94,7 +94,7 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
             } catch (Exception e) {
                 hostname = "";
             }
-
+            
             Logger.log("Xmpp login attempt: " + Settings.get("xmpp.xmpp_login")
                     + "@" + Settings.get("xmpp.xmpp_host") + " from "
                     + Settings.get("xmpp.xmpp_ressource", hostname));
@@ -103,17 +103,17 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
                     Settings.get("xmpp.xmpp_ressource", hostname).toString());
             this.logged = true;
             Logger.log("Login succeed");
-
+            
             this.conn.getChatManager().addChatListener(this);
-
+            
         } catch (XMPPException e) {
             Logger.error("Login failed: " + e.getMessage());
             return false;
         }
-
+        
         return true;
     }
-
+    
     public void logout() {
         Logger.log("Xmpp logout");
         this.conn.disconnect();
@@ -122,7 +122,9 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
     // On message received
     @Override
     public void processMessage(Chat chat, Message message) {
-        if (message.getType() == Message.Type.normal) {
+        Message.Type t = message.getType();
+        if (t.equals(Message.Type.normal) || t.equals(Message.Type.chat)) {
+            Logger.debug("Message received: ".concat(chat.getParticipant()).concat(": ").concat(message.getBody()));
             Input input = new Input(chat, message);
             for (Filter filter : Filters.filters) {
                 if (!filter.inputFiltering(input)) {
@@ -130,13 +132,13 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
                     return;
                 }
             }
-
+            
             for (InputListener listener : this.input_listeners) {
                 listener.messageReceived(this, input);
             }
         }
     }
-
+    
     public void send(Chat chat, Output output) {
         for (Filter filter : Filters.filters) {
             if (!filter.outputFiltering(output)) {
@@ -144,14 +146,14 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
                 return;
             }
         }
-
+        
         try {
             chat.sendMessage(output.toString());
         } catch (XMPPException e) {
             Logger.error("Sending response error: " + e.getMessage());
         }
     }
-
+    
     public void sendPresence(Presence p) {
         Logger.log("Xmpp status: " + p.toString());
         this.conn.sendPacket(p);

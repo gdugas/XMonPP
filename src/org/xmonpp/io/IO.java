@@ -63,14 +63,14 @@ public class IO {
 
         try {
             this.properties.store(o, null);
-            boolean b = message.removeSubject("xm");
-            message.addSubject("xm", o.toString());
+            boolean b = m.removeSubject("xm");
+            m.addSubject("xm", o.toString());
 
         } catch (Exception e) {
             Logger.error("IO.getMessage exception: ".concat(e.getMessage()));
         }
 
-        return message;
+        return m;
     }
 
     public static Properties parseProperties(Message m) {
