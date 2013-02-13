@@ -21,13 +21,11 @@ import org.xmonpp.io.Filter;
 import org.xmonpp.io.Filters;
 import org.xmonpp.io.Input;
 import org.xmonpp.io.InputListener;
-import org.xmonpp.io.Output;
 import org.xmonpp.io.OutputListener;
 
 public class XmonPPDaemon implements ChatManagerListener, MessageListener {
     
     private Collection<InputListener> input_listeners = new ArrayList<InputListener>();
-    private Collection<OutputListener> output_listeners = new ArrayList<OutputListener>();
     private boolean logged = false;
     private ConnectionConfiguration config;
     private XMPPConnection conn;
@@ -37,10 +35,6 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
     
     public void addInputListener(InputListener listener) {
         this.input_listeners.add(listener);
-    }
-    
-    public void addOutputListener(OutputListener listener) {
-        this.output_listeners.add(listener);
     }
     
     @Override
@@ -136,21 +130,6 @@ public class XmonPPDaemon implements ChatManagerListener, MessageListener {
             for (InputListener listener : this.input_listeners) {
                 listener.messageReceived(this, input);
             }
-        }
-    }
-    
-    public void send(Chat chat, Output output) {
-        for (Filter filter : Filters.filters) {
-            if (!filter.outputFiltering(output)) {
-                filter.onOutputError(output);
-                return;
-            }
-        }
-        
-        try {
-            chat.sendMessage(output.toString());
-        } catch (XMPPException e) {
-            Logger.error("Sending response error: " + e.getMessage());
         }
     }
     
