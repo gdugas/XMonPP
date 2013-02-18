@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.packet.Message;
-import org.xmonpp.logger.Logger;
+import org.xmonpp.Logger;
 
 /**
  *
@@ -67,7 +67,7 @@ public class IO {
             m.addSubject("xm", o.toString());
 
         } catch (Exception e) {
-            Logger.error("IO.getMessage exception: ".concat(e.getMessage()));
+            Logger.getLogger().severe("IO.getMessage exception: ".concat(e.getMessage()));
         }
 
         return m;

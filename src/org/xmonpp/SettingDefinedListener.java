@@ -1,4 +1,4 @@
-package org.xmonpp.conf;
+package org.xmonpp;
 
 public interface SettingDefinedListener {
 

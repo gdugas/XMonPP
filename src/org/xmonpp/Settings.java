@@ -1,4 +1,4 @@
-package org.xmonpp.conf;
+package org.xmonpp;
 
 import java.io.FileReader;
 import java.util.ArrayList;

@@ -1,7 +1,8 @@
 package org.xmonpp.io;
 
-import org.xmonpp.daemon.XmonPPDaemon;
+import org.xmonpp.Daemon;
 
 public interface InputListener {
-    void messageReceived(XmonPPDaemon daemon, Input input);
+
+    void messageReceived(Daemon daemon, Input input);
 }

@@ -4,6 +4,7 @@
  */
 package org.xmonpp.conf;
 
+import org.xmonpp.Settings;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
