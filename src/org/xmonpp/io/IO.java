@@ -5,12 +5,13 @@
 package org.xmonpp.io;
 
 import java.util.Properties;
+import java.util.logging.Logger;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.packet.Message;
-import org.xmonpp.Logger;
+
 
 /**
  *
@@ -67,7 +68,7 @@ public class IO {
             m.addSubject("xm", o.toString());
 
         } catch (Exception e) {
-            Logger.getLogger().severe("IO.getMessage exception: ".concat(e.getMessage()));
+            Logger.getLogger("xmonpp").severe("IO.getMessage exception: ".concat(e.getMessage()));
         }
 
         return m;

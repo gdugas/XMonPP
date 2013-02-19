@@ -3,7 +3,7 @@ package org.xmonpp.io;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
 
-import org.xmonpp.Logger;
+import java.util.logging.Logger;
 
 public class Output extends IO {
 
@@ -26,7 +26,7 @@ public class Output extends IO {
         try {
             this.chat.sendMessage(this.getMessage());
         } catch (XMPPException e) {
-            Logger.getLogger().severe("Sending response error: ".concat(e.getMessage()));
+            Logger.getLogger("xmonpp").severe("Sending response error: ".concat(e.getMessage()));
         }
     }
 }

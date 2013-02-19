@@ -3,6 +3,7 @@ package org.xmonpp;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
@@ -26,7 +27,7 @@ public class Daemon implements ChatManagerListener, MessageListener {
     private boolean logged = false;
     private ConnectionConfiguration config;
     private XMPPConnection conn;
-    protected Logger logger = Logger.getLogger();
+    protected static final Logger logger = Logger.getLogger("xmonpp");
 
     public Daemon() {
     }
