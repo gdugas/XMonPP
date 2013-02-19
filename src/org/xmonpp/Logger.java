@@ -18,6 +18,9 @@ public class Logger extends java.util.logging.Logger {
     }
 
     public static Logger getLogger() {
+        if (xmonlogger == null) {
+            Logger.setUp();
+        }
         return xmonlogger;
     }
 }
